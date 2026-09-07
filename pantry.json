@@ -1,0 +1,258 @@
+{
+  "olive oil": {
+    "status": "have",
+    "category": "oils"
+  },
+  "vegetable oil": {
+    "status": "have",
+    "category": "oils"
+  },
+  "sesame oil": {
+    "status": "have",
+    "category": "oils"
+  },
+  "coconut oil": {
+    "status": "have",
+    "category": "oils"
+  },
+  "white wine vinegar": {
+    "status": "have",
+    "category": "vinegars"
+  },
+  "red wine vinegar": {
+    "status": "have",
+    "category": "vinegars"
+  },
+  "rice vinegar": {
+    "status": "have",
+    "category": "vinegars"
+  },
+  "apple cider vinegar": {
+    "status": "have",
+    "category": "vinegars"
+  },
+  "balsamic vinegar": {
+    "status": "have",
+    "category": "vinegars"
+  },
+  "soy sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "fish sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "oyster sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "hoisin sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "worcestershire sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "hot sauce": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "sriracha": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "ketchup": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "mayonnaise": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "dijon mustard": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "yellow mustard": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "tomato paste": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "canned crushed tomatoes": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "white rice": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "basmati rice": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "pasta (spaghetti)": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "pasta (short)": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "dried lentils": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "panko breadcrumbs": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "all-purpose flour": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "cornstarch": {
+    "status": "have",
+    "category": "dry goods"
+  },
+  "baking powder": {
+    "status": "have",
+    "category": "baking"
+  },
+  "baking soda": {
+    "status": "have",
+    "category": "baking"
+  },
+  "white sugar": {
+    "status": "have",
+    "category": "baking"
+  },
+  "brown sugar": {
+    "status": "have",
+    "category": "baking"
+  },
+  "honey": {
+    "status": "have",
+    "category": "baking"
+  },
+  "vanilla extract": {
+    "status": "have",
+    "category": "baking"
+  },
+  "cocoa powder": {
+    "status": "have",
+    "category": "baking"
+  },
+  "rolled oats": {
+    "status": "have",
+    "category": "baking"
+  },
+  "active dry yeast": {
+    "status": "have",
+    "category": "baking"
+  },
+  "kosher salt": {
+    "status": "have",
+    "category": "spices"
+  },
+  "black pepper": {
+    "status": "have",
+    "category": "spices"
+  },
+  "garlic powder": {
+    "status": "have",
+    "category": "spices"
+  },
+  "onion powder": {
+    "status": "have",
+    "category": "spices"
+  },
+  "smoked paprika": {
+    "status": "have",
+    "category": "spices"
+  },
+  "sweet paprika": {
+    "status": "have",
+    "category": "spices"
+  },
+  "cumin": {
+    "status": "have",
+    "category": "spices"
+  },
+  "coriander": {
+    "status": "have",
+    "category": "spices"
+  },
+  "turmeric": {
+    "status": "have",
+    "category": "spices"
+  },
+  "chili flakes": {
+    "status": "have",
+    "category": "spices"
+  },
+  "cayenne pepper": {
+    "status": "have",
+    "category": "spices"
+  },
+  "cinnamon": {
+    "status": "have",
+    "category": "spices"
+  },
+  "dried oregano": {
+    "status": "have",
+    "category": "spices"
+  },
+  "dried thyme": {
+    "status": "have",
+    "category": "spices"
+  },
+  "bay leaves": {
+    "status": "have",
+    "category": "spices"
+  },
+  "italian seasoning": {
+    "status": "have",
+    "category": "spices"
+  },
+  "curry powder": {
+    "status": "have",
+    "category": "spices"
+  },
+  "garam masala": {
+    "status": "have",
+    "category": "spices"
+  },
+  "chinese five spice": {
+    "status": "have",
+    "category": "spices"
+  },
+  "dried chili": {
+    "status": "have",
+    "category": "spices"
+  },
+  "frozen peas": {
+    "status": "have",
+    "category": "frozen"
+  },
+  "frozen corn": {
+    "status": "have",
+    "category": "frozen"
+  },
+  "frozen edamame": {
+    "status": "have",
+    "category": "frozen"
+  },
+  "frozen spinach": {
+    "status": "have",
+    "category": "frozen"
+  },
+  "frozen mixed vegetables": {
+    "status": "have",
+    "category": "frozen"
+  }
+}
