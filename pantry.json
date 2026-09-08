@@ -1,238 +1,230 @@
 {
   "olive oil": {
-    "status": "have",
+    "status": "out",
     "category": "oils"
   },
   "vegetable oil": {
-    "status": "have",
+    "status": "out",
     "category": "oils"
   },
   "sesame oil": {
-    "status": "have",
+    "status": "out",
     "category": "oils"
   },
   "coconut oil": {
-    "status": "have",
+    "status": "out",
     "category": "oils"
   },
   "white wine vinegar": {
-    "status": "have",
+    "status": "out",
     "category": "vinegars"
   },
   "red wine vinegar": {
-    "status": "have",
+    "status": "out",
     "category": "vinegars"
   },
   "rice vinegar": {
-    "status": "have",
+    "status": "out",
     "category": "vinegars"
   },
   "apple cider vinegar": {
-    "status": "have",
+    "status": "out",
     "category": "vinegars"
   },
   "balsamic vinegar": {
-    "status": "have",
+    "status": "out",
     "category": "vinegars"
   },
   "soy sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "fish sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "oyster sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "hoisin sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "worcestershire sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "hot sauce": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "sriracha": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "ketchup": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "mayonnaise": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "dijon mustard": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "yellow mustard": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
   "tomato paste": {
-    "status": "have",
+    "status": "out",
     "category": "sauces"
   },
-  "canned crushed tomatoes": {
-    "status": "have",
+  "crushed tomatoes": {
+    "status": "out",
     "category": "sauces"
   },
-  "white rice": {
+  "rice": {
     "status": "have",
     "category": "dry goods"
   },
-  "basmati rice": {
-    "status": "have",
-    "category": "dry goods"
-  },
-  "pasta (spaghetti)": {
-    "status": "have",
-    "category": "dry goods"
-  },
-  "pasta (short)": {
-    "status": "have",
+  "pasta": {
+    "status": "out",
     "category": "dry goods"
   },
   "dried lentils": {
-    "status": "have",
+    "status": "out",
     "category": "dry goods"
   },
   "panko breadcrumbs": {
-    "status": "have",
+    "status": "out",
     "category": "dry goods"
   },
   "all-purpose flour": {
-    "status": "have",
+    "status": "out",
     "category": "dry goods"
   },
   "cornstarch": {
-    "status": "have",
+    "status": "out",
     "category": "dry goods"
   },
   "baking powder": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "baking soda": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "white sugar": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "brown sugar": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "honey": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "vanilla extract": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "cocoa powder": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
-  "rolled oats": {
+  "oats": {
     "status": "have",
     "category": "baking"
   },
   "active dry yeast": {
-    "status": "have",
+    "status": "out",
     "category": "baking"
   },
   "kosher salt": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "black pepper": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "garlic powder": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "onion powder": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "smoked paprika": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "sweet paprika": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "cumin": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "coriander": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "turmeric": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "chili flakes": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "cayenne pepper": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "cinnamon": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "dried oregano": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "dried thyme": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "bay leaves": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "italian seasoning": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "curry powder": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "garam masala": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "chinese five spice": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "dried chili": {
-    "status": "have",
+    "status": "out",
     "category": "spices"
   },
   "frozen peas": {
@@ -244,15 +236,19 @@
     "category": "frozen"
   },
   "frozen edamame": {
-    "status": "have",
+    "status": "out",
     "category": "frozen"
   },
   "frozen spinach": {
-    "status": "have",
+    "status": "out",
     "category": "frozen"
   },
   "frozen mixed vegetables": {
-    "status": "have",
+    "status": "out",
     "category": "frozen"
+  },
+  "taco seasoning": {
+    "status": "have",
+    "category": "spices"
   }
 }
