@@ -2,20 +2,23 @@
   "weeks": [
     {
       "meals": [
-        "Beef and Bean Chili",
-        "Sheet Pan Salmon and Vegetables"
+        "Beef and corn burritos with cheese and salsa verde",
+        "green curry with spinach and basa fillets",
+        "cheese quesadillas with salsa",
+        "eggs with oatmeal"
       ],
       "other_items": [
         "whole milk",
-        "cashews",
         "rice crackers",
         "yoghurt",
-        "frozen mango",
+        "frozen blueberries",
         "bananas",
-        "cucumbers"
+        "cucumbers",
+        "rice cakes",
+        "peanut butter"
       ],
-      "notes": "Went with chili and sheet pan salmon to keep variety across protein and cooking method. Salmon returning after a five-week gap.",
-      "feedback": "Chili was good, could use more heat next time. Salmon was tasty but the potatoes came out undercooked — swap for a faster-cooking vegetable next time. Good variety between the two preps overall."
+      "notes": "Went with burritos because pantry only had a few ingredients at the time, and they only needed to be seasoned with taco seasoning. Went with eggs with oatmeal and quesadillas because these are both very quick to prepare.",
+      "feedback": "Spinach came out with a poor texture in the curry, burritos were fine, I enjoyed the simplicity of the quesadillas and eggs with oatmeal -- this is a good benchmark for the level of difficulty I want for the quick meals each week. Note that I can handle more complexity on the meal prep meals."
     }
   ]
 }

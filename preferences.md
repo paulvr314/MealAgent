@@ -6,15 +6,19 @@
 
 22-year-old male, 1.94m, 85–90kg, training approximately 5 days per week.
 
-**Daily targets:** 3,300–3,350 calories, at least 110g protein. Meals should also support
+**Daily targets:** 3,100–3,300 calories, at least 110g protein. Meals should also support
 adequate iron intake and include a reasonable amount of fruit and vegetables across the week.
+
+I will aim for about 1000 calories for lunch, and 1100 to 1300 calories for dinner. 1000-1500 calories each week
+will come from snacks that are not part of the meal plan. Another 4000-4500 calories will come from eating out.
+Therefor the meal plan should account for approximately 17000 to 17500 calories per week.
 
 ---
 
 ## What to plan each week
 
-Plan **2 meal-prep meals per week plus 2 quick meals per week plus snacks.** Each meal prep produces a large batch that covers
-approximately 4 meals (eaten as lunches and dinners across several days). These are the
+Plan **2 meal-prep meals per week plus 2 quick meals per week plus snacks.** Each meal prep produces a large batch that covers 
+4 meals (eaten as lunches and dinners across several days). These are the
 core of the weekly plan and the primary output of the meal planner.
 
 Do not plan meals as breakfast — I handle that myself (see below).
@@ -35,7 +39,7 @@ weekly shop.
 ## Cooking style
 
 **Minimal processing is a mild preference.** I avoid pre-processing ingredients most of the times — chopping vegetables, mincing garlic, grating cheese, slicing onions, and similar
-tasks. I strongly prefer alternatives that skip this step entirely. Examples:
+tasks. I prefer alternatives that skip this step entirely. Examples:
 
 - Baby carrots instead of chopping a large carrot
 - Jarred minced garlic instead of fresh cloves
@@ -45,7 +49,7 @@ tasks. I strongly prefer alternatives that skip this step entirely. Examples:
 **Few dishes.** I prefer meals that don't require many pots, pans, or utensils. One-pot or
 sheet-pan meals are ideal where they fit.
 
-I can tolerate occasional exceptions to both of the above — I cook a variety of things and
+I can tolerate exceptions to both of the above — I cook a variety of things and
 don't follow these rules rigidly — but the above rules should generally be kept in mind.
 
 ---
@@ -91,12 +95,15 @@ the main output.
 
 - Frozen dumplings with broccoli or a similar vegetable
 - Oatmeal and eggs, optionally with frozen fruit and peanut butter
+- quesadillas
 
 ---
 
 ## Snacks
 
 These don't need to be planned as meals but should appear in the weekly shop as needed.
+Some snacks that I usually buy are listed below, but be sure to include snacks that are not
+on this list, as I enjoy variety.
 
 - Roasted unsalted cashews
 - Barbeque rice crackers
@@ -115,13 +122,3 @@ These don't need to be planned as meals but should appear in the weekly shop as 
 ## Beverages
 
 - 2 gallons of whole milk per week
-
----
-
-## House essentials (buy in bulk, not in the weekly order)
-
-These should always be on hand and restocked before they run out, not included in the
-regular weekly grocery order.
-
-- Oats
-- Rice

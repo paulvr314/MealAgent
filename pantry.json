@@ -1,6 +1,6 @@
 {
   "olive oil": {
-    "status": "out",
+    "status": "have",
     "category": "oils"
   },
   "vegetable oil": {
@@ -147,10 +147,6 @@
     "status": "out",
     "category": "baking"
   },
-  "kosher salt": {
-    "status": "out",
-    "category": "spices"
-  },
   "black pepper": {
     "status": "out",
     "category": "spices"
@@ -168,11 +164,11 @@
     "category": "spices"
   },
   "sweet paprika": {
-    "status": "out",
+    "status": "have",
     "category": "spices"
   },
   "cumin": {
-    "status": "out",
+    "status": "have",
     "category": "spices"
   },
   "coriander": {
@@ -188,7 +184,7 @@
     "category": "spices"
   },
   "cayenne pepper": {
-    "status": "out",
+    "status": "have",
     "category": "spices"
   },
   "cinnamon": {
@@ -208,7 +204,7 @@
     "category": "spices"
   },
   "italian seasoning": {
-    "status": "out",
+    "status": "have",
     "category": "spices"
   },
   "curry powder": {
@@ -216,7 +212,7 @@
     "category": "spices"
   },
   "garam masala": {
-    "status": "out",
+    "status": "have",
     "category": "spices"
   },
   "chinese five spice": {
@@ -250,5 +246,29 @@
   "taco seasoning": {
     "status": "have",
     "category": "spices"
+  },
+  "butter": {
+    "status": "have",
+    "category": "oils"
+  },
+  "salt": {
+    "status": "have",
+    "category": "spices"
+  },
+  "garlic": {
+    "status": "have",
+    "category": "spices"
+  },
+  "pepper": {
+    "status": "have",
+    "category": "spices"
+  },
+  "salsa": {
+    "status": "have",
+    "category": "sauces"
+  },
+  "peanut butter": {
+    "status": "have",
+    "category": "sauces"
   }
 }
