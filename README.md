@@ -5,6 +5,8 @@ asks Claude for a weekly meal plan, and turns that plan into a shopping list. Or
 is manual; a `confirm` step closes the loop afterwards. Everything is local: Python
 scripts and flat JSON files, with no server or database.
 
+Note -- This is my first attempt at using agentic AI development to rapidly bring a project to life. The prompt was created by me, but the pantry management systems was almost entirely created using claude code. 
+
 ## Setup
 
 Requires Python 3.11+ and an Anthropic API key.
@@ -20,8 +22,7 @@ Create a `.env` file in the project root:
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 ```
-
-Edit `preferences.md` to describe how you eat. It is the planner's authoritative source.
+It is the planner's authoritative source. In this git repo you will find example `preferences.md` and `feedback.json` files. These files are here for your reference but are specific to me. These should be edited to match your own personal eating and needs.
 
 ## Weekly workflow
 
