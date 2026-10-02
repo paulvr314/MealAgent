@@ -3,6 +3,7 @@
 .venv/
 
 pantry_snapshot.json
+CLAUDE.md
 
 meal_plan.json
 shopping_list.json
