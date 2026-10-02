@@ -1,35 +1,25 @@
 #!/usr/bin/env python3
 """
-generate_pantry_snapshot.py — Generate pantry_snapshot.json for MealAgent.
+pantry_snapshot.py — Generate pantry_snapshot.json for MealAgent.
 
 Reads the current pantry state via pantry.py and writes a fresh
 pantry_snapshot.json containing only in-stock ("have") items, grouped by
 category. Out-of-stock items are omitted entirely — their absence is what
 signals the meal planner to treat them as unavailable.
 
-Run this immediately before each meal planning run:
-    python generate_pantry_snapshot.py
+meal_planner.py calls main() automatically before each run; it can also be
+run on its own:
+    python pantry_snapshot.py
 
 Output file: pantry_snapshot.json (same directory as this script).
 """
 
 import json
-import sys
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Import pantry helpers from pantry.py (must live in the same directory)
-# ---------------------------------------------------------------------------
+from pantry import load_pantry
 
-script_dir = Path(__file__).parent
-sys.path.insert(0, str(script_dir))
-
-try:
-    from pantry import load_pantry
-except ImportError as exc:
-    sys.exit(f"Error: could not import pantry.py from {script_dir} — {exc}")
-
-SNAPSHOT_FILE = script_dir / "pantry_snapshot.json"
+SNAPSHOT_FILE = Path(__file__).parent / "pantry_snapshot.json"
 
 
 def generate_snapshot() -> dict[str, list[str]]:

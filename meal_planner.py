@@ -9,6 +9,7 @@ back as a parsed dict in the tool_use block's `input`, so there is no prose
 preamble to strip, no markdown fences to handle, and no JSON parsing step.
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -17,13 +18,17 @@ import anthropic
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ValidationError
 
+import feedback
+import pantry
 import pantry_snapshot
 
 load_dotenv()
 
 MODEL = "claude-sonnet-4-6"
-MAX_TOKENS = 4096
+MAX_TOKENS = 8192
 TOOL_NAME = "submit_meal_plan"
+# 2 meal-prep + 2 quick meals, per preferences.md. Used only for a warning.
+EXPECTED_MEALS = 4
 
 # ── Pydantic models ───────────────────────────────────────────────────────────
 # Field descriptions are surfaced to the model through the tool schema, so keep
@@ -44,7 +49,13 @@ class Ingredient(BaseModel):
         )
     )
     is_staple: bool = Field(
-        description="True if this ingredient appears in the pantry snapshot."
+        description=(
+            "True for reusable pantry-type items (spices, oils, vinegars, "
+            "sauces, condiments, dry goods, baking supplies, frozen bulk), "
+            "whether or not they appear in the pantry snapshot. False for "
+            "fresh ingredients consumed by the recipe (produce, meat, fish, "
+            "dairy)."
+        )
     )
 
 class Meal(BaseModel):
@@ -160,9 +171,66 @@ def extract_plan_input(response) -> dict:
         )
     sys.exit(1)
 
+# ── Guards and checks ─────────────────────────────────────────────────────────
+
+def check_previous_plan_recorded() -> None:
+    """Refuse to overwrite a meal_plan.json that feedback.py hasn't recorded.
+
+    meal_plan.json is the only copy of the plan until feedback.py appends it
+    to feedback.json, so overwriting it first loses that week from history.
+    """
+    plan_file = BASE / "meal_plan.json"
+    if not plan_file.exists():
+        return
+    plan = feedback.load_meal_plan(plan_file)
+    history = feedback.load_feedback(feedback.FEEDBACK_FILE)
+    if feedback.already_recorded(history, feedback.build_week(plan)):
+        return
+    print(
+        "[error] meal_plan.json holds a plan that isn't in feedback.json yet.\n"
+        "        Run feedback.py to record it first, or pass --force to "
+        "overwrite it."
+    )
+    sys.exit(1)
+
+def warn_on_plan_issues(plan: MealPlan) -> None:
+    """Print warnings for invariant violations the schema can't express."""
+    pantry_keys = set(pantry.load_pantry())
+    warnings = []
+
+    if len(plan.meals) != EXPECTED_MEALS:
+        warnings.append(f"{len(plan.meals)} meals planned, expected {EXPECTED_MEALS}")
+
+    for meal in plan.meals:
+        for ing in meal.ingredients:
+            name = pantry._normalize(ing.name)
+            where = f"'{ing.name}' in {meal.name}"
+            if ing.is_staple and ing.quantity is not None:
+                warnings.append(f"{where}: staple with a quantity ({ing.quantity})")
+            if not ing.is_staple and ing.quantity is None:
+                warnings.append(f"{where}: fresh ingredient with no quantity")
+            if ing.is_staple and name not in pantry_keys:
+                warnings.append(f"{where}: staple isn't a pantry key (naming drift?)")
+
+    for w in warnings:
+        print(f"[warn] {w}")
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
+    parser = argparse.ArgumentParser(
+        prog="meal_planner.py",
+        description="Generate this week's meal plan into meal_plan.json.",
+    )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Overwrite meal_plan.json even if feedback.py hasn't recorded it",
+    )
+    args = parser.parse_args()
+
+    if not args.force:
+        check_previous_plan_recorded()
+
     system_prompt = read_text("meal_planner_prompt.md")
     if not system_prompt:
         print("[error] meal_planner_prompt.md not found — cannot continue")
@@ -200,6 +268,7 @@ def main():
     out = BASE / "meal_plan.json"
     out.write_text(plan.model_dump_json(indent=2), encoding="utf-8")
     print(f"Saved → {out}\n")
+    warn_on_plan_issues(plan)
 
     # Print readable summary
     print("=" * 52)

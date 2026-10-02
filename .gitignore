@@ -5,3 +5,7 @@
 pantry_snapshot.json
 
 meal_plan.json
+shopping_list.json
+
+__pycache__/
+*.tmp

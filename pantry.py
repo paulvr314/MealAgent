@@ -44,9 +44,12 @@ def load_pantry() -> dict:
 
 
 def save_pantry(pantry: dict) -> None:
-    with PANTRY_FILE.open("w", encoding="utf-8") as f:
+    """Write pantry.json atomically, so a crash mid-write can't wipe it."""
+    tmp = PANTRY_FILE.with_suffix(PANTRY_FILE.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
         json.dump(pantry, f, indent=2, ensure_ascii=False)
         f.write("\n")
+    tmp.replace(PANTRY_FILE)
 
 
 # ---------------------------------------------------------------------------

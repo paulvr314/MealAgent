@@ -130,8 +130,12 @@ Plan exactly the number of meals the preferences specify — no more, no fewer.
 - Use the simplest, most common name: "soy sauce" not "low-sodium soy sauce";
   "olive oil" not "extra-virgin olive oil" — unless the user specified
   otherwise.
-- Every ingredient matching a key in the pantry snapshot is marked
-  `is_staple: true` and uses the snapshot's exact name.
+- Every reusable pantry-type ingredient — spice, oil, vinegar, sauce,
+  condiment, dry good, baking supply, frozen bulk item — is marked
+  `is_staple: true`, **including when it is not in the snapshot**. The
+  snapshot lists only what's in stock, so a missing staple is one that needs
+  buying, not a fresh ingredient. If it is in the snapshot, use the
+  snapshot's exact name.
 - Staples always have `quantity: null`. The pantry tracks presence, not
   amounts.
 - Fresh ingredients always have a quantity with units.

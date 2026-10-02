@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 """
-shopping_list.py — Shopping list generator + auto-restock for MealAgent.
+shopping_list.py — Shopping list generator + confirm step for MealAgent.
 
 Reads a meal plan (meal_plan.json, format defined in meal_planner_prompt.md),
 flattens every meal's ingredients plus the other_items section, and decides
-what goes on the shopping list:
+what goes on the shopping list. The pantry, not the meal plan's is_staple
+flag, is the authority on what counts as a staple:
 
-  * is_staple == false  ->  fresh / non-pantry item, always on the list,
-                            with its quantity from the meal plan.
-  * is_staple == true   ->  ask the pantry (via pantry.py):
-                              - in stock ("have")  -> do nothing
-                              - depleted ("out") or not tracked at all
-                                -> put it on the list (name only, no
-                                   quantity) and mark it stocked in the
-                                   pantry.
-  * other_items         ->  never staples; always on the list.
+  * name is a pantry key, status "have"  ->  skip, already on hand.
+  * name is a pantry key, status "out"   ->  restock section, name only.
+  * name is not a pantry key:
+      - is_staple == true   ->  "untracked staples" section, with a warning.
+                                Usually naming drift ("toasted sesame oil"
+                                vs "sesame oil"); never auto-added.
+      - otherwise           ->  fresh section, with its quantity.
 
-Everything is returned in alphabetical order.
+Why the pantry wins: pantry_snapshot.json only lists "have" items, so the
+planner can't see that an out-of-stock staple is tracked and marks it
+is_staple: false. Trusting that flag would buy the staple as "fresh" and
+never flip it back to "have".
 
-Pantry writes go exclusively through pantry.py, which owns pantry.json.
+Generating the list is read-only. It writes shopping_list.json; once the
+order is placed, `shopping_list.py confirm` marks the restocked staples as
+in stock via pantry.py. Pantry writes go exclusively through pantry.py,
+which owns pantry.json.
 """
 
 from __future__ import annotations
@@ -28,12 +33,15 @@ import json
 import re
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
 import pantry
 
-MEAL_PLAN_FILE = Path(__file__).parent / "meal_plan.json"
+BASE = Path(__file__).parent
+MEAL_PLAN_FILE = BASE / "meal_plan.json"
+SHOPPING_LIST_FILE = BASE / "shopping_list.json"
 
 
 # ---------------------------------------------------------------------------
@@ -69,17 +77,20 @@ class ShoppingList:
 
     fresh: list[ShoppingItem] = field(default_factory=list)
     restock: list[ShoppingItem] = field(default_factory=list)
+    # Marked is_staple by the planner but not a pantry key — likely drift.
+    untracked: list[ShoppingItem] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)   # staples already in stock
 
     @property
     def items(self) -> list[ShoppingItem]:
-        """The whole list, fresh + restock, in alphabetical order."""
-        return sorted(self.fresh + self.restock, key=lambda i: i.name)
+        """The whole list in alphabetical order."""
+        return sorted(self.fresh + self.restock + self.untracked, key=lambda i: i.name)
 
     def as_dict(self) -> dict:
         return {
             "fresh": [i.as_dict() for i in self.fresh],
             "restock": [i.as_dict() for i in self.restock],
+            "untracked": [i.as_dict() for i in self.untracked],
             "skipped": self.skipped,
         }
 
@@ -118,12 +129,6 @@ def combine_quantities(existing: str | None, incoming: str | None) -> str | None
         return incoming
     if incoming is None:
         return existing
-    if existing == incoming:
-        # Two identical counts of an uncountable-looking thing: still additive.
-        parsed = _parse_quantity(existing)
-        if parsed:
-            return _format_amount(parsed[0] * 2, parsed[1])
-        return f"{existing} + {incoming}"
 
     left, right = _parse_quantity(existing), _parse_quantity(incoming)
     if left and right and left[1] == right[1]:
@@ -132,7 +137,7 @@ def combine_quantities(existing: str | None, incoming: str | None) -> str | None
 
 
 # ---------------------------------------------------------------------------
-# Meal plan loading
+# File I/O
 # ---------------------------------------------------------------------------
 
 def load_meal_plan(path: Path = MEAL_PLAN_FILE) -> dict:
@@ -145,12 +150,21 @@ def load_meal_plan(path: Path = MEAL_PLAN_FILE) -> dict:
     return plan
 
 
+def save_json(path: Path, data: dict) -> None:
+    """Write JSON atomically."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    tmp.replace(path)
+
+
 def flatten_plan(plan: dict) -> list[dict]:
     """Every ingredient of every meal, plus other_items, as flat records.
 
-    Each record: {name, quantity, is_staple, source}. other_items are never
-    pantry staples — they're bought as individual items every week — so they
-    come through with is_staple False.
+    Each record: {name, quantity, is_staple, source}. other_items carry
+    is_staple False; the pantry lookup still catches any that are tracked
+    staples (e.g. peanut butter).
     """
     records: list[dict] = []
 
@@ -174,7 +188,7 @@ def flatten_plan(plan: dict) -> list[dict]:
         records.append({
             "name": name,
             "quantity": item.get("quantity"),
-            "is_staple": bool(item.get("is_staple", False)),
+            "is_staple": False,
             "source": "other items",
         })
 
@@ -185,82 +199,93 @@ def flatten_plan(plan: dict) -> list[dict]:
 # Generation
 # ---------------------------------------------------------------------------
 
-def generate_shopping_list(
-    plan: dict,
-    *,
-    restock: bool = True,
-) -> ShoppingList:
-    """Build the shopping list and (unless restock=False) update the pantry.
+def _add(bucket: dict[str, ShoppingItem], record: dict, *, staple: bool) -> None:
+    """Add a record to a section, merging with an existing line of the same name."""
+    name = record["name"]
+    # Staples go on the list by name only — the pantry tracks presence, not amounts.
+    quantity = None if staple else record["quantity"]
+    item = bucket.get(name)
+    if item is None:
+        bucket[name] = ShoppingItem(
+            name=name, quantity=quantity, is_staple=staple, sources=[record["source"]]
+        )
+        return
+    if not staple:
+        item.quantity = combine_quantities(item.quantity, quantity)
+    if record["source"] not in item.sources:
+        item.sources.append(record["source"])
 
-    A staple lands on the list when the pantry says it's "out" or doesn't
-    know about it at all. Those same names are then handed to
-    `pantry.py stock`, which flips them back to "have".
-    """
+
+def generate_shopping_list(plan: dict) -> ShoppingList:
+    """Build the shopping list. Read-only: never touches the pantry."""
     pantry_state = pantry.load_pantry()
-    records = flatten_plan(plan)
 
     fresh: dict[str, ShoppingItem] = {}
-    restock_needed: dict[str, ShoppingItem] = {}
+    restock: dict[str, ShoppingItem] = {}
+    untracked: dict[str, ShoppingItem] = {}
     skipped: set[str] = set()
 
-    for record in records:
-        name = record["name"]
-
-        if not record["is_staple"]:
-            item = fresh.get(name)
-            if item is None:
-                fresh[name] = ShoppingItem(
-                    name=name,
-                    quantity=record["quantity"],
-                    is_staple=False,
-                    sources=[record["source"]],
-                )
+    for record in flatten_plan(plan):
+        entry = pantry_state.get(record["name"])
+        if entry is not None:
+            if entry.get("status") == "have":
+                skipped.add(record["name"])
             else:
-                item.quantity = combine_quantities(item.quantity, record["quantity"])
-                if record["source"] not in item.sources:
-                    item.sources.append(record["source"])
-            continue
+                _add(restock, record, staple=True)
+        elif record["is_staple"]:
+            _add(untracked, record, staple=True)
+        else:
+            _add(fresh, record, staple=False)
 
-        # Staple: the pantry decides.
-        entry = pantry_state.get(name)
-        if entry is not None and entry.get("status") == "have":
-            skipped.add(name)
-            continue
+    def by_name(bucket: dict[str, ShoppingItem]) -> list[ShoppingItem]:
+        return sorted(bucket.values(), key=lambda i: i.name)
 
-        item = restock_needed.get(name)
-        if item is None:
-            # Staples go on the list by name only — the pantry tracks
-            # presence, not amounts.
-            restock_needed[name] = ShoppingItem(
-                name=name,
-                quantity=None,
-                is_staple=True,
-                sources=[record["source"]],
-            )
-        elif record["source"] not in item.sources:
-            item.sources.append(record["source"])
-
-    shopping_list = ShoppingList(
-        fresh=sorted(fresh.values(), key=lambda i: i.name),
-        restock=sorted(restock_needed.values(), key=lambda i: i.name),
+    return ShoppingList(
+        fresh=by_name(fresh),
+        restock=by_name(restock),
+        untracked=by_name(untracked),
         skipped=sorted(skipped),
     )
 
-    if restock and shopping_list.restock:
-        restock_pantry([i.name for i in shopping_list.restock])
 
-    return shopping_list
+# ---------------------------------------------------------------------------
+# Confirm
+# ---------------------------------------------------------------------------
 
+def confirm(path: Path = SHOPPING_LIST_FILE) -> None:
+    """Mark the saved list's restock staples as in stock, through pantry.py.
 
-def restock_pantry(names: list[str]) -> None:
-    """Mark staples as in stock, through pantry.py.
-
-    `yes=True` matches `pantry.py stock ... --yes`: a staple the meal plan
-    named but the pantry has never seen gets created as "uncategorized" and
-    marked in stock, instead of being dropped. Neither flag path prompts, so
-    this is safe to call unattended.
+    Uses `stock --no` semantics: anything that isn't tracked is skipped, never
+    auto-added. Running it twice is a no-op.
     """
-    pantry.cmd_stock(SimpleNamespace(items=names, yes=True, no=False))
+    if not path.exists():
+        print(f"No saved shopping list at {path} — run shopping_list.py first.",
+              file=sys.stderr)
+        sys.exit(1)
+    with path.open(encoding="utf-8") as f:
+        saved = json.load(f)
+
+    if saved.get("confirmed_at"):
+        print(f"This list was already confirmed at {saved['confirmed_at']}. Nothing to do.")
+        return
+
+    names = [item["name"] for item in saved.get("restock", [])]
+    if names:
+        print("Restocking pantry:")
+        pantry.cmd_stock(SimpleNamespace(items=names, yes=False, no=True))
+    else:
+        print("No staples to restock.")
+
+    untracked = [item["name"] for item in saved.get("untracked", [])]
+    if untracked:
+        print("\nNot tracked in the pantry (left alone). If any of these are real staples,")
+        print("add them, or fix the name if it's drift from an existing key:")
+        for name in untracked:
+            print(f'  pantry.py add "{name}" --category <category>')
+
+    saved["confirmed_at"] = datetime.now().isoformat(timespec="seconds")
+    save_json(path, saved)
+    print("\nConfirmed. If the store was out of something, run: pantry.py out \"<item>\"")
 
 
 # ---------------------------------------------------------------------------
@@ -291,11 +316,17 @@ def format_shopping_list(shopping_list: ShoppingList, *, flat: bool = False) -> 
         else:
             lines.append("    (nothing — pantry is fully stocked)")
         lines.append("")
+        if shopping_list.untracked:
+            lines.append("  UNTRACKED STAPLES  (not pantry keys — check for naming drift)")
+            for item in shopping_list.untracked:
+                lines.append(f"    □  {item.name}")
+            lines.append("")
 
     total = len(shopping_list.items)
     lines.append(
         f"  {total} item(s) — {len(shopping_list.fresh)} fresh, "
         f"{len(shopping_list.restock)} restock, "
+        f"{len(shopping_list.untracked)} untracked, "
         f"{len(shopping_list.skipped)} staple(s) already on hand\n"
     )
     return "\n".join(lines)
@@ -309,17 +340,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="shopping_list.py",
         description=(
-            "Generate this week's shopping list from meal_plan.json and "
-            "restock the pantry staples that went on it."
+            "Generate this week's shopping list from meal_plan.json, then "
+            "`confirm` once the order is placed to restock the pantry."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 examples:
-  %(prog)s                          # generate the list and restock the pantry
-  %(prog)s --dry-run                # generate the list, leave the pantry alone
+  %(prog)s                          # generate the list (pantry untouched)
   %(prog)s --json                   # machine-readable, for agent use
-  %(prog)s --flat                   # one alphabetical list, no fresh/restock split
+  %(prog)s --flat                   # one alphabetical list, no section split
   %(prog)s --plan other_plan.json   # read a different meal plan
+  %(prog)s confirm                  # order placed: mark restocked staples in stock
 """,
     )
     parser.add_argument(
@@ -327,16 +358,17 @@ examples:
         help="Path to the meal plan JSON (default: ./meal_plan.json)"
     )
     parser.add_argument(
-        "--dry-run", action="store_true",
-        help="Show the list without writing anything to the pantry"
-    )
-    parser.add_argument(
         "--flat", action="store_true",
-        help="Print one alphabetical list instead of splitting fresh/restock"
+        help="Print one alphabetical list instead of splitting into sections"
     )
     parser.add_argument(
         "--json", action="store_true",
         help="Output raw JSON to stdout (for machine/agent use)"
+    )
+    sub = parser.add_subparsers(dest="command", metavar="COMMAND")
+    sub.add_parser(
+        "confirm",
+        help="Mark the saved list's restock staples as in stock (pantry.py stock --no)",
     )
     return parser
 
@@ -344,28 +376,38 @@ examples:
 def main() -> None:
     args = build_parser().parse_args()
 
+    if args.command == "confirm":
+        confirm()
+        return
+
     try:
         plan = load_meal_plan(Path(args.plan))
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         print(f"Could not read the meal plan: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    # In --json mode the pantry.py restock chatter would pollute the JSON
-    # stream, so send it to stderr for the duration of the run.
-    real_stdout = sys.stdout
-    if args.json:
-        sys.stdout = sys.stderr
-    try:
-        shopping_list = generate_shopping_list(plan, restock=not args.dry_run)
-    finally:
-        sys.stdout = real_stdout
+    shopping_list = generate_shopping_list(plan)
+
+    for item in shopping_list.untracked:
+        print(
+            f"[warn] '{item.name}' is marked as a staple but isn't a pantry key "
+            f"(from: {', '.join(item.sources)}). Possible naming drift.",
+            file=sys.stderr,
+        )
+
+    save_json(SHOPPING_LIST_FILE, {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "plan": str(Path(args.plan).resolve()),
+        "confirmed_at": None,
+        **shopping_list.as_dict(),
+    })
 
     if args.json:
         print(json.dumps(shopping_list.as_dict(), indent=2))
     else:
         print(format_shopping_list(shopping_list, flat=args.flat))
-        if args.dry_run and shopping_list.restock:
-            print("  (--dry-run: pantry not updated)\n")
+        if shopping_list.restock:
+            print("  Once the order is placed, run: shopping_list.py confirm\n")
 
 
 if __name__ == "__main__":
